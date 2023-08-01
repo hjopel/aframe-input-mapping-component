@@ -25,4 +25,5 @@ DoubleTouch.prototype = {
   }
 }
 
-AFRAME.registerInputActivator('doubletouch', DoubleTouch);
+// const registeredDoubletouch = AFRAME.registerInputActivator('doubletouch', DoubleTouch);
+export { DoubleTouch };

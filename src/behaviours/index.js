@@ -4,4 +4,5 @@ AFRAME.registerInputBehaviour = function (name, definition) {
   AFRAME.inputBehaviours[name] = definition;
 };
 
-require('./dpad.js');
+
+export { DPad } from './dpad.js';

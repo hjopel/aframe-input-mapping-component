@@ -70,26 +70,26 @@
 "use strict";
 
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; /* global AFRAME */
 
-/* global AFRAME */
 
-if (typeof AFRAME === 'undefined') {
-  throw new Error('Component attempted to register before AFRAME was available.');
+var _activators = __webpack_require__(1);
+
+var _behaviours = __webpack_require__(6);
+
+if (typeof AFRAME === "undefined") {
+  throw new Error("Component attempted to register before AFRAME was available.");
 }
-
-__webpack_require__(1);
-__webpack_require__(6);
 
 AFRAME.currentInputMapping = null;
 AFRAME.inputMappings = {};
 AFRAME.inputActions = {};
 
 var behaviour = {
-  trackpad: 'dpad'
+  trackpad: "dpad"
 };
 
-AFRAME.registerSystem('input-mapping', {
+AFRAME.registerSystem("input-mapping", {
   mappings: {},
   mappingsPerControllers: {},
   loadedControllers: [],
@@ -97,9 +97,18 @@ AFRAME.registerSystem('input-mapping', {
   init: function init() {
     var self = this;
 
+    AFRAME.registerComponent("longpress", _activators.LongPress);
+    AFRAME.registerComponent("doublepress", _activators.DoublePress);
+    AFRAME.registerComponent("doubletouch", _activators.DoubleTouch);
+    AFRAME.registerInputActivator("down", (0, _activators.createSimpleActivator)("down"));
+    AFRAME.registerInputActivator("up", (0, _activators.createSimpleActivator)("up"));
+    AFRAME.registerInputActivator("touchstart", (0, _activators.createSimpleActivator)("touchstart"));
+    AFRAME.registerInputActivator("touchend", (0, _activators.createSimpleActivator)("touchend"));
+    AFRAME.registerInputBehaviour("dpad", _behaviours.DPad);
+
     this.keyboardHandler = this.keyboardHandler.bind(this);
 
-    this.sceneEl.addEventListener('inputmappingregistered', function () {
+    this.sceneEl.addEventListener("inputmappingregistered", function () {
       self.removeControllersListeners();
       for (var i = 0; i < self.loadedControllers.length; i++) {
         var controllerObj = self.loadedControllers[i];
@@ -108,7 +117,7 @@ AFRAME.registerSystem('input-mapping', {
     });
 
     // Controllers
-    this.sceneEl.addEventListener('controllerconnected', function (event) {
+    this.sceneEl.addEventListener("controllerconnected", function (event) {
       var matchedController = self.findMatchingController(event.target);
 
       if (matchedController) {
@@ -128,7 +137,7 @@ AFRAME.registerSystem('input-mapping', {
       self.updateControllersListeners(controllerObj);
     });
 
-    this.sceneEl.addEventListener('controllerdisconnected', function (event) {
+    this.sceneEl.addEventListener("controllerdisconnected", function (event) {
       var controller = self.findMatchingController(event.target);
       if (controller) {
         self.removeControllerListeners(controller);
@@ -152,15 +161,15 @@ AFRAME.registerSystem('input-mapping', {
   },
 
   addKeyboardListeners: function addKeyboardListeners() {
-    document.addEventListener('keyup', this.keyboardHandler);
-    document.addEventListener('keydown', this.keyboardHandler);
-    document.addEventListener('keypress', this.keyboardHandler);
+    document.addEventListener("keyup", this.keyboardHandler);
+    document.addEventListener("keydown", this.keyboardHandler);
+    document.addEventListener("keypress", this.keyboardHandler);
   },
 
   removeKeyboardListeners: function removeKeyboardListeners() {
-    document.removeEventListener('keyup', this.keyboardHandler);
-    document.removeEventListener('keydown', this.keyboardHandler);
-    document.removeEventListener('keypress', this.keyboardHandler);
+    document.removeEventListener("keyup", this.keyboardHandler);
+    document.removeEventListener("keydown", this.keyboardHandler);
+    document.removeEventListener("keypress", this.keyboardHandler);
   },
 
   removeControllerListeners: function removeControllerListeners(controller) {
@@ -199,7 +208,7 @@ AFRAME.registerSystem('input-mapping', {
     this.removeControllerListeners(controllerObj);
 
     if (!AFRAME.inputMappings) {
-      console.warn('input-mapping: No mappings defined');
+      console.warn("input-mapping: No mappings defined");
       return;
     }
 
@@ -221,7 +230,7 @@ AFRAME.registerSystem('input-mapping', {
       if (controllerMappings) {
         this.updateMappingsPerController(controllerMappings, mappingsPerController, mappingName);
       } else {
-        console.warn('input-mapping: No mappings defined for controller type: ', controllerObj.name);
+        console.warn("input-mapping: No mappings defined for controller type: ", controllerObj.name);
       }
     }
 
@@ -241,7 +250,7 @@ AFRAME.registerSystem('input-mapping', {
       return function (event) {
         var mapping = mappingsPerController.mappings[eventName];
         var mappedEvent = mapping[AFRAME.currentInputMapping];
-        if ((typeof mappedEvent === 'undefined' ? 'undefined' : _typeof(mappedEvent)) === 'object') {
+        if ((typeof mappedEvent === "undefined" ? "undefined" : _typeof(mappedEvent)) === "object") {
           // Handedness
           var controller = self.findMatchingController(event.target);
           mappedEvent = mappedEvent[controller.hand];
@@ -255,8 +264,8 @@ AFRAME.registerSystem('input-mapping', {
 
     for (var eventName in mappingsPerController.mappings) {
       // Check for activators
-      if (eventName.indexOf('.') !== -1) {
-        var aux = eventName.split('.');
+      if (eventName.indexOf(".") !== -1) {
+        var aux = eventName.split(".");
         var button = aux[0]; // eg: trackpad
         var activatorName = aux[1]; // eg: doublepress
         var onActivate = OnActivate(eventName);
@@ -274,7 +283,7 @@ AFRAME.registerSystem('input-mapping', {
 
   checkValidInputMapping: function checkValidInputMapping() {
     if (AFRAME.currentInputMapping === null) {
-      console.warn('input-mapping: No current input mapping defined.');
+      console.warn("input-mapping: No current input mapping defined.");
     }
   },
 
@@ -282,8 +291,11 @@ AFRAME.registerSystem('input-mapping', {
     this.checkValidInputMapping();
     if (AFRAME.inputMappings && AFRAME.inputMappings.mappings[AFRAME.currentInputMapping] && AFRAME.inputMappings.mappings[AFRAME.currentInputMapping].keyboard) {
       var currentKeyboardMapping = AFRAME.inputMappings.mappings[AFRAME.currentInputMapping].keyboard;
+
+      console.log('keyboardHandler', event.keyCode, event.key, event.type, currentKeyboardMapping);
       var key = event.keyCode === 32 ? "Space" : event.key;
       var keyEvent = (key + "_" + event.type.substr(3)).toLowerCase();
+      console.log('keyEvent', keyEvent, currentKeyboardMapping[keyEvent]);
       var mapEvent = currentKeyboardMapping[keyEvent];
       if (mapEvent) {
         this.sceneEl.emit(mapEvent);
@@ -326,11 +338,11 @@ AFRAME.registerSystem('input-mapping', {
 
 AFRAME.registerInputActions = function (inputActions, defaultActionSet) {
   AFRAME.inputActions = inputActions;
-  if (typeof defaultActionSet !== 'undefined') {
+  if (typeof defaultActionSet !== "undefined") {
     if (AFRAME.inputActions[defaultActionSet]) {
       AFRAME.currentInputMapping = defaultActionSet;
     } else {
-      console.error('input-mapping: trying to set a non registered action set \'' + defaultActionSet + '\'');
+      console.error("input-mapping: trying to set a non registered action set '" + defaultActionSet + "'");
     }
   }
 };
@@ -369,7 +381,7 @@ AFRAME.registerInputMappings = function (data, override) {
   }
 
   for (var i = 0; i < AFRAME.scenes.length; i++) {
-    AFRAME.scenes[i].emit('inputmappingregistered');
+    AFRAME.scenes[i].emit("inputmappingregistered");
   }
 };
 
@@ -380,16 +392,51 @@ AFRAME.registerInputMappings = function (data, override) {
 "use strict";
 
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _longpress = __webpack_require__(2);
+
+Object.defineProperty(exports, "LongPress", {
+  enumerable: true,
+  get: function get() {
+    return _longpress.LongPress;
+  }
+});
+
+var _doubletouch = __webpack_require__(3);
+
+Object.defineProperty(exports, "DoubleTouch", {
+  enumerable: true,
+  get: function get() {
+    return _doubletouch.DoubleTouch;
+  }
+});
+
+var _doublepress = __webpack_require__(4);
+
+Object.defineProperty(exports, "DoublePress", {
+  enumerable: true,
+  get: function get() {
+    return _doublepress.DoublePress;
+  }
+});
+
+var _simpleactivator = __webpack_require__(5);
+
+Object.defineProperty(exports, "createSimpleActivator", {
+  enumerable: true,
+  get: function get() {
+    return _simpleactivator.createSimpleActivator;
+  }
+});
 AFRAME.inputActivators = {};
 
 AFRAME.registerInputActivator = function (name, definition) {
   AFRAME.inputActivators[name] = definition;
 };
-
-__webpack_require__(2);
-__webpack_require__(3);
-__webpack_require__(4);
-__webpack_require__(5);
+// require('./longpress.js');
 
 /***/ }),
 /* 2 */
@@ -398,11 +445,14 @@ __webpack_require__(5);
 "use strict";
 
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 function LongPress(el, button, onActivate) {
   this.lastTime = 0;
   this.timeOut = 250;
-  this.eventNameDown = button + 'down';
-  this.eventNameUp = button + 'up';
+  this.eventNameDown = button + "down";
+  this.eventNameUp = button + "up";
 
   this.el = el;
   this.onActivate = onActivate;
@@ -430,7 +480,12 @@ LongPress.prototype = {
   }
 };
 
-AFRAME.registerInputActivator('longpress', LongPress);
+// const registeredLongpress = AFRAME.registerInputActivator(
+//   "longpress",
+//   LongPress
+// );
+
+exports.LongPress = LongPress;
 
 /***/ }),
 /* 3 */
@@ -439,6 +494,9 @@ AFRAME.registerInputActivator('longpress', LongPress);
 "use strict";
 
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 function DoubleTouch(el, button, onActivate) {
   this.lastTime = 0;
   this.timeOut = 250;
@@ -465,7 +523,8 @@ DoubleTouch.prototype = {
   }
 };
 
-AFRAME.registerInputActivator('doubletouch', DoubleTouch);
+// const registeredDoubletouch = AFRAME.registerInputActivator('doubletouch', DoubleTouch);
+exports.DoubleTouch = DoubleTouch;
 
 /***/ }),
 /* 4 */
@@ -474,6 +533,9 @@ AFRAME.registerInputActivator('doubletouch', DoubleTouch);
 "use strict";
 
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 function DoublePress(el, button, onActivate) {
   this.lastTime = 0;
   this.timeOut = 250;
@@ -500,7 +562,8 @@ DoublePress.prototype = {
   }
 };
 
-AFRAME.registerInputActivator('doublepress', DoublePress);
+// const registeredDoublepress = AFRAME.registerInputActivator('doublepress', DoublePress);
+exports.DoublePress = DoublePress;
 
 /***/ }),
 /* 5 */
@@ -509,16 +572,29 @@ AFRAME.registerInputActivator('doublepress', DoublePress);
 "use strict";
 
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 function createSimpleActivator(suffix) {
   return function (el, button, onActivate) {
-    el.addEventListener(button + suffix, onActivate);
+    var eventName = button + suffix;
+
+    el.addEventListener(eventName, onActivate);
+    this.removeListeners = function () {
+      el.removeEventListener(eventName, onActivate);
+    };
   };
 }
 
-AFRAME.registerInputActivator('down', createSimpleActivator('down'));
-AFRAME.registerInputActivator('up', createSimpleActivator('up'));
-AFRAME.registerInputActivator('touchstart', createSimpleActivator('touchstart'));
-AFRAME.registerInputActivator('touchend', createSimpleActivator('touchend'));
+// AFRAME.registerInputActivator("down", createSimpleActivator("down"));
+// AFRAME.registerInputActivator("up", createSimpleActivator("up"));
+// AFRAME.registerInputActivator(
+//   "touchstart",
+//   createSimpleActivator("touchstart")
+// );
+// AFRAME.registerInputActivator("touchend", createSimpleActivator("touchend"));
+
+exports.createSimpleActivator = createSimpleActivator;
 
 /***/ }),
 /* 6 */
@@ -527,13 +603,23 @@ AFRAME.registerInputActivator('touchend', createSimpleActivator('touchend'));
 "use strict";
 
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _dpad = __webpack_require__(7);
+
+Object.defineProperty(exports, 'DPad', {
+  enumerable: true,
+  get: function get() {
+    return _dpad.DPad;
+  }
+});
 AFRAME.inputBehaviours = {};
 
 AFRAME.registerInputBehaviour = function (name, definition) {
   AFRAME.inputBehaviours[name] = definition;
 };
-
-__webpack_require__(7);
 
 /***/ }),
 /* 7 */
@@ -542,18 +628,22 @@ __webpack_require__(7);
 "use strict";
 
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 function DPad(el, buttonName) {
   this.buttonName = buttonName;
   this.onButtonPresed = this.onButtonPresed.bind(this);
   this.onAxisMove = this.onAxisMove.bind(this);
-  el.addEventListener('trackpaddown', this.onButtonPresed);
-  el.addEventListener('trackpadup', this.onButtonPresed);
-  el.addEventListener('axismove', this.onAxisMove);
+  el.addEventListener("trackpaddown", this.onButtonPresed);
+  el.addEventListener("trackpadup", this.onButtonPresed);
+  el.addEventListener("axismove", this.onAxisMove);
   this.lastPos = [0, 0];
   this.el = el;
-};
+}
 
 DPad.prototype = {
   onAxisMove: function onAxisMove(event) {
@@ -565,13 +655,13 @@ DPad.prototype = {
         x = _lastPos[0],
         y = _lastPos[1];
 
-    var state = 'trackpadup'.includes(event.type) ? "up" : "down";
+    var state = "trackpadup".includes(event.type) ? "up" : "down";
     var centerZone = 0.5;
     var direction = state === "up" && this.lastDirection // Always trigger the up event for the last down event
     ? this.lastDirection : x * x + y * y < centerZone * centerZone // If within center zone angle does not matter
     ? "center" : angleToDirection(Math.atan2(x, y));
 
-    this.el.emit(this.buttonName + 'dpad' + direction + state);
+    this.el.emit(this.buttonName + "dpad" + direction + state);
 
     if (state === "down") {
       this.lastDirection = direction;
@@ -581,9 +671,9 @@ DPad.prototype = {
   },
 
   removeListeners: function removeListeners() {
-    el.removeEventListener('trackpaddown', this.onButtonPresed);
-    el.removeEventListener('trackpadup', this.onButtonPresed);
-    el.removeEventListener('axismove', this.onAxisMove);
+    el.removeEventListener("trackpaddown", this.onButtonPresed);
+    el.removeEventListener("trackpadup", this.onButtonPresed);
+    el.removeEventListener("axismove", this.onAxisMove);
   }
 };
 
@@ -600,7 +690,8 @@ var angleToDirection = function angleToDirection(angle) {
   }
 };
 
-AFRAME.registerInputBehaviour('dpad', DPad);
+// const registeredDpad = AFRAME.registerInputBehaviour("dpad", DPad);
+exports.DPad = DPad;
 
 /***/ })
 /******/ ]);

@@ -1,32 +1,32 @@
-function DPad (el, buttonName) {
+function DPad(el, buttonName) {
   this.buttonName = buttonName;
   this.onButtonPresed = this.onButtonPresed.bind(this);
   this.onAxisMove = this.onAxisMove.bind(this);
-  el.addEventListener('trackpaddown', this.onButtonPresed);
-  el.addEventListener('trackpadup', this.onButtonPresed);
-  el.addEventListener('axismove', this.onAxisMove);
-  this.lastPos = [0,0];
+  el.addEventListener("trackpaddown", this.onButtonPresed);
+  el.addEventListener("trackpadup", this.onButtonPresed);
+  el.addEventListener("axismove", this.onAxisMove);
+  this.lastPos = [0, 0];
   this.el = el;
-};
+}
 
 DPad.prototype = {
-  onAxisMove: function(event) {
+  onAxisMove: function (event) {
     this.lastPos = event.detail.axis;
   },
-  
+
   onButtonPresed: function (event) {
     const [x, y] = this.lastPos;
-    const state = 'trackpadup'.includes(event.type) ? "up" : "down";
+    const state = "trackpadup".includes(event.type) ? "up" : "down";
     var centerZone = 0.5;
     const direction =
       state === "up" && this.lastDirection // Always trigger the up event for the last down event
         ? this.lastDirection
         : x * x + y * y < centerZone * centerZone // If within center zone angle does not matter
-          ? "center"
-          : angleToDirection(Math.atan2(x, y));
+        ? "center"
+        : angleToDirection(Math.atan2(x, y));
 
     this.el.emit(`${this.buttonName}dpad${direction}${state}`);
-        
+
     if (state === "down") {
       this.lastDirection = direction;
     } else {
@@ -35,10 +35,10 @@ DPad.prototype = {
   },
 
   removeListeners: function () {
-    el.removeEventListener('trackpaddown', this.onButtonPresed);
-    el.removeEventListener('trackpadup', this.onButtonPresed);
-    el.removeEventListener('axismove', this.onAxisMove);
-  }
+    el.removeEventListener("trackpaddown", this.onButtonPresed);
+    el.removeEventListener("trackpadup", this.onButtonPresed);
+    el.removeEventListener("axismove", this.onAxisMove);
+  },
 };
 
 const angleToDirection = function (angle) {
@@ -54,4 +54,5 @@ const angleToDirection = function (angle) {
   }
 };
 
-AFRAME.registerInputBehaviour('dpad', DPad);
+// const registeredDpad = AFRAME.registerInputBehaviour("dpad", DPad);
+export { DPad };

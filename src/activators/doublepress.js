@@ -25,4 +25,5 @@ DoublePress.prototype = {
   }
 }
 
-AFRAME.registerInputActivator('doublepress', DoublePress);
+// const registeredDoublepress = AFRAME.registerInputActivator('doublepress', DoublePress);
+export { DoublePress };
